@@ -2,6 +2,8 @@ package com.example.finnaviaapp.Network;
 
 import android.util.Log;
 
+import com.example.finnaviaapp.Callbck;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,7 +34,7 @@ Application Keys
 
     }
 
-    public void loadData(){
+    public void loadData(final Callbck callbck){
         Worker worker = Worker.getInstance();
         worker.registerTask(new Runnable() {
             @Override
@@ -47,8 +49,9 @@ Application Keys
                     Log.d("FinnaReq", connection.getResponseCode()+"");
                     if(connection.getResponseCode() == 200){
                         InputStream inputStream = connection.getInputStream();
-                        String scanner = new Scanner(inputStream).useDelimiter("\\A").next();
-                        Log.d("FinnaReq",scanner);
+                        String fulldata = new Scanner(inputStream).useDelimiter("\\A").next();
+                        Log.d("FinnaReq",fulldata);
+                        callbck.onItemsLoaded(fulldata);
 
 
                     }else{
