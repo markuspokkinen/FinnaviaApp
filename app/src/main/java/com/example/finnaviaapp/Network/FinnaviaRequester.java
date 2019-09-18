@@ -30,11 +30,10 @@ Application Keys
 
      */
 
-    public FinnaviaRequester(){
-
+    public FinnaviaRequester() {
     }
 
-    public void loadData(final Callbck callbck){
+    public void loadData(final Callbck callbck) {
         Worker worker = Worker.getInstance();
         worker.registerTask(new Runnable() {
             @Override
@@ -43,20 +42,27 @@ Application Keys
                     URL url = new URL("https://api.finavia.fi/flights/public/v0/flights/all/all");
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-                    connection.setRequestProperty("app_id","4e435059");
-                    connection.setRequestProperty("app_key","f77d35a68549aaf13b2fc9ba6fe01c6f");
+                    connection.setRequestProperty("app_id", "4e435059");
+                    connection.setRequestProperty("app_key", "f77d35a68549aaf13b2fc9ba6fe01c6f");
 
-                    Log.d("FinnaReq", connection.getResponseCode()+"");
-                    if(connection.getResponseCode() == 200){
+                    Log.d("FinnaReq", connection.getResponseCode() + "");
+                    if (connection.getResponseCode() == 200) {
                         InputStream inputStream = connection.getInputStream();
-                        String fulldata = new Scanner(inputStream).useDelimiter("\\A").next();
-                        Log.d("FinnaReq",fulldata);
+                        Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+                        String fulldata = scanner.hasNext() ? scanner.next() : "";
+                        Log.d("FinnaReq",fulldata.length()+" length");
+                        //Log.d("FinnaReq", fulldata);
+                        String[]splitted = fulldata.split("body");
+                        Log.d("FinnaReq",splitted.length+" splitted length");
+                        for (String s: splitted){
+                            Log.d("FinnaReq",s);
+                        }
                         callbck.onItemsLoaded(fulldata);
 
 
-                    }else{
+                    } else {
                         //failed to connect
-                        Log.d("FinnaReq","Failed to connect");
+                        Log.d("FinnaReq", "Failed to connect");
                     }
 
                 } catch (IOException e) {
@@ -65,7 +71,4 @@ Application Keys
             }
         });
     }
-
-
-
 }

@@ -9,12 +9,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
 
-import com.example.finnaviaapp.Fragments.ElementFragment;
-import com.example.finnaviaapp.Network.FinnaviaRequester;
+import com.example.finnaviaapp.Fragments.MainFragment;
 
-public class MainActivity extends AppCompatActivity implements ElementFragment.OnFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements MainFragment.OnFragmentInteractionListener{
     private Context context;
     private String s;
 
@@ -25,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements ElementFragment.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         try {
-            switchfragment(ElementFragment.TAG);
+            switchfragment(MainFragment.TAG);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {

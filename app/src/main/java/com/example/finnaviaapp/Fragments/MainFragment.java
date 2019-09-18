@@ -4,9 +4,12 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.finnaviaapp.Callbck;
@@ -17,16 +20,16 @@ import com.example.finnaviaapp.R;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ElementFragment.OnFragmentInteractionListener} interface
+ * {@link MainFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ElementFragment#newInstance} factory method to
+ * Use the {@link MainFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ElementFragment extends Fragment {
-    public static final String TAG = ElementFragment.class.getName();
+public class MainFragment extends Fragment {
+    public static final String TAG = MainFragment.class.getName();
     private OnFragmentInteractionListener mListener;
 
-    public ElementFragment() {
+    public MainFragment() {
         // Required empty public constructor
     }
 
@@ -40,8 +43,10 @@ public class ElementFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View fragment = inflater.inflate(R.layout.fragment_element,container,false);
-        final TextView tv = fragment.findViewById(R.id.elementString);
+        View fragment = inflater.inflate(R.layout.main_fragment,container,false);
+        final TextView tv = fragment.findViewById(R.id.textView2);
+
+        final ProgressBar sp = fragment.findViewById(R.id.progressBar3);
         FinnaviaRequester fr = new FinnaviaRequester();
         fr.loadData(new Callbck() {
             @Override
@@ -50,6 +55,9 @@ public class ElementFragment extends Fragment {
                     @Override
                     public void run() {
                         tv.setText(data);
+                        tv.setMovementMethod(new ScrollingMovementMethod());
+                        sp.setVisibility(View.GONE);
+
                     }
                 });
 
@@ -80,7 +88,7 @@ public class ElementFragment extends Fragment {
         mListener = null;
     }
 
-    public static ElementFragment newInstance(){return new ElementFragment();}
+    public static MainFragment newInstance(){return new MainFragment();}
 
     /**
      * This interface must be implemented by activities that contain this
