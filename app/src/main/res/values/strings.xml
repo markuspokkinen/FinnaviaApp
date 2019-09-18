@@ -4,6 +4,14 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="loading">Data Loading</string>
     <string name="tabItemsArr">Arrivals</string>
-    <string name="tabItmesDep">Departures</string>
+    <string name="tabItemsDep">Departures</string>
+    <string name="finnaviaArrivals">arr</string>
+    <string name="finnaviaDepartures">dep</string>
+
+    <string-array name="airports">
+        <item>all</item>
+        <item>HEL</item>
+        <item>TKU</item>
+    </string-array>
 
 </resources>

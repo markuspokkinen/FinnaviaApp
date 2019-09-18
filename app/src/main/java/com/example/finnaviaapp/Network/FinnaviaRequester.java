@@ -1,8 +1,12 @@
 package com.example.finnaviaapp.Network;
 
 import android.util.Log;
+import android.util.Xml;
 
 import com.example.finnaviaapp.Callbck;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,13 +37,13 @@ Application Keys
     public FinnaviaRequester() {
     }
 
-    public void loadData(final Callbck callbck) {
+    public void loadData(final String deporarr, final String airport, final Callbck callbck) {
         Worker worker = Worker.getInstance();
         worker.registerTask(new Runnable() {
             @Override
             public void run() {
                 try {
-                    URL url = new URL("https://api.finavia.fi/flights/public/v0/flights/all/all");
+                    URL url = new URL("https://api.finavia.fi/flights/public/v0/flights/"+deporarr+"/"+airport);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
                     connection.setRequestProperty("app_id", "4e435059");
@@ -48,16 +52,10 @@ Application Keys
                     Log.d("FinnaReq", connection.getResponseCode() + "");
                     if (connection.getResponseCode() == 200) {
                         InputStream inputStream = connection.getInputStream();
-                        Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
-                        String fulldata = scanner.hasNext() ? scanner.next() : "";
-                        Log.d("FinnaReq",fulldata.length()+" length");
-                        //Log.d("FinnaReq", fulldata);
-                        String[]splitted = fulldata.split("body");
-                        Log.d("FinnaReq",splitted.length+" splitted length");
-                        for (String s: splitted){
-                            Log.d("FinnaReq",s);
-                        }
-                        callbck.onItemsLoaded(fulldata);
+                        XmlPullParser parser = Xml.newPullParser();
+                        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES,false);
+                        parser.setInput(inputStream,null);
+                        parser.nextTag();
 
 
                     } else {
@@ -66,6 +64,8 @@ Application Keys
                     }
 
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (XmlPullParserException e) {
                     e.printStackTrace();
                 }
             }
