@@ -52,10 +52,7 @@ Application Keys
                     Log.d("FinnaReq", connection.getResponseCode() + "");
                     if (connection.getResponseCode() == 200) {
                         InputStream inputStream = connection.getInputStream();
-                        XmlPullParser parser = Xml.newPullParser();
-                        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES,false);
-                        parser.setInput(inputStream,null);
-                        parser.nextTag();
+                        callbck.onItemsLoaded(inputStream);
 
 
                     } else {
@@ -64,8 +61,6 @@ Application Keys
                     }
 
                 } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (XmlPullParserException e) {
                     e.printStackTrace();
                 }
             }
