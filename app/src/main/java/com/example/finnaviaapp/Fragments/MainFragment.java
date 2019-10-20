@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -25,10 +26,12 @@ import com.example.finnaviaapp.R;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -63,13 +66,14 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View fragment = inflater.inflate(R.layout.main_fragment, container, false);
+        final View fragment = inflater.inflate(R.layout.main_fragment, container, false);
         context = container.getContext();
         fr = new FinnaviaRequester();
 
+        final LinearLayout linearLayout = fragment.findViewById(R.id.MainLinerLayout);
         final TextView tv = fragment.findViewById(R.id.textView2);
         final ProgressBar sp = fragment.findViewById(R.id.progressBar3);
-        datarequest(context.getString(R.string.finnaviaArrivals), tv, sp);
+        datarequest(context.getString(R.string.finnaviaArrivals), sp, tv,linearLayout);
 
 
         TabLayout tb = fragment.findViewById(R.id.maintab);
@@ -77,10 +81,10 @@ public class MainFragment extends Fragment {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getText().toString().equals("Arrivals")) {
-                    datarequest(context.getString(R.string.finnaviaArrivals), tv, sp);
+                    datarequest(context.getString(R.string.finnaviaArrivals), sp,tv,linearLayout);
                     Log.d("mf_oTS", "Arrivals");
                 } else {
-                    datarequest(context.getString(R.string.finnaviaDepartures), tv, sp);
+                    datarequest(context.getString(R.string.finnaviaDepartures), sp,tv,linearLayout);
                     Log.d("mf_oTS", "Departures");
                 }
             }
@@ -122,107 +126,40 @@ public class MainFragment extends Fragment {
         mListener = null;
     }
 
-    private void datarequest(final String arrordep, final TextView tv, final ProgressBar sp) {
+    private void datarequest(final String arrordep, final ProgressBar sp,final TextView mainTv, final LinearLayout linearLayout) {
         fr.loadData(arrordep, "all", new Callbck() {
             @Override
-            public void onItemsLoaded(final InputStream data) {
+            public void onItemsLoaded(final Object data) {
                 if (arrordep.equals("arr")) {
                     mListener.startUiUpdate(new Runnable() {
                         @Override
                         public void run() {
                             Log.d("MF:dr", "mListnerStarted");
-                            List dataList;
-                            try {
-                                tv.setText(((InputStream) data).toString());
-                                sp.setVisibility(View.GONE);
-                                dataList = parse((InputStream) data);
-                               Log.d("MF:dr", "dataList filled");
-                            } catch (XmlPullParserException e) {
-                               Log.d("MF:dr","XMLPullParserException");
-                               e.printStackTrace();
-                            } catch (IOException e) {
-                                Log.d("MF:dr","IOException");
-                                e.printStackTrace();
-                            }
+                            sp.setVisibility(View.GONE);
+                            mainTv.setText("");
 
 
                         }
                     });
+                    for(final String s: (List<String>)data){
+                        mListener.startUiUpdate(new Runnable() {
+                            @Override
+                            public void run() {
+                                TextView tv = new TextView(linearLayout.getContext());
+                                tv.setText(s);
+                                linearLayout.addView(tv);
+                            }
+                        });
+                    }
                 } else {
 
                 }
-
-
+                Log.d("MF:dr", "All Loaded");
             }
         });
     }
 
-    private List parse(InputStream in) throws XmlPullParserException, IOException {
-        try {
-            Log.d("MF:p", "parse");
-            XmlPullParser parser = Xml.newPullParser();
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-            parser.setInput(in, null);
-            parser.nextTag();
-            return readFeed(parser);
-        } finally {
-            in.close();
-        }
 
-    }
-
-    private List readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
-        List entries = new ArrayList();
-        Log.d("MF:rF", "reedFeed");
-        parser.require(XmlPullParser.START_TAG,ns,"");
-        while (parser.next() != XmlPullParser.END_TAG) {
-            if (parser.getEventType() != XmlPullParser.START_TAG) {
-                continue;
-            }
-            String name = parser.getName();
-            if (name.equals("flight")) {
-                Log.d("MF:rF", "flight");
-                entries.add(readEntry(parser));
-                Log.d("MF:rF","Last Data: "+entries.get(entries.size()-1).toString());
-            }
-
-        }
-        Log.d("MF:rF","List size: "+entries.size());
-        return entries;
-    }
-
-
-
-    private List<FinnaviaDepartureEntity> readEntry(XmlPullParser parser) throws IOException, XmlPullParserException {
-        List<FinnaviaDepartureEntity> list = new ArrayList<>();
-
-        while (parser.next() != XmlPullParser.END_TAG) {
-            FinnaviaDepartureEntity fde = new FinnaviaDepartureEntity();
-            if (parser.getEventType() != XmlPullParser.START_TAG) {
-                continue;
-            }
-            String name = parser.getName();
-
-            if (name.equals("h_apt")) {
-                Log.d("MF:rE", "h_apt");
-                fde.setHomeAirport(readElement(parser));
-            }
-
-            list.add(fde);
-        }
-        Log.d("MF:Re","list size: "+list.size());
-        return list;
-    }
-
-    private String readElement(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String result = "";
-        if (parser.next() == XmlPullParser.TEXT) {
-            result = parser.getText();
-            parser.nextTag();
-        }
-        Log.d("MF:rE","readElement: "+result);
-        return result;
-    }
 
     public static MainFragment newInstance() {
         return new MainFragment();

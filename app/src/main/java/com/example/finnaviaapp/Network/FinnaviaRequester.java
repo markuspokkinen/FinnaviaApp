@@ -16,6 +16,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.acl.LastOwnerException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class FinnaviaRequester {
@@ -52,7 +54,11 @@ Application Keys
                     Log.d("FinnaReq", connection.getResponseCode() + "");
                     if (connection.getResponseCode() == 200) {
                         InputStream inputStream = connection.getInputStream();
-                        callbck.onItemsLoaded(inputStream);
+
+                        Scanner scanner = new Scanner(inputStream).useDelimiter("\\A");
+                        String data = scanner.hasNext() ? scanner.next(): "";
+                        List<String> dataList = parse(data);
+                        callbck.onItemsLoaded(dataList);
 
 
                     } else {
@@ -65,5 +71,10 @@ Application Keys
                 }
             }
         });
+    }
+
+    private List<String> parse(String data) {
+        Log.d("MF:p", "parse");
+        return  Arrays.asList(data.split("<flight>"));
     }
 }
